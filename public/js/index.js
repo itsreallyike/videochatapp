@@ -10,9 +10,10 @@ window.onload = function(){
   var callButton = document.getElementById("callButton");
   var hangupButton = document.getElementById("hangupButton");
   var remote = false //false for local connection
+  var started = false
   var localStream, pc;
 
-  startButton.disabled=false;
+  startButton.disabled = true;
   callButton.disabled = true;
   hangupButton.disabled = true;
   startButton.onclick = start;
@@ -21,7 +22,9 @@ window.onload = function(){
 
   function start() {
     startButton.disabled = true;
+    if(started) {
     callButton.disabled = false;
+    };
     navigator.mediaDevices.getUserMedia(constraints)
     .then(function(mediaStream) {
         localVideo.src = window.URL.createObjectURL(mediaStream);
@@ -33,12 +36,13 @@ window.onload = function(){
     socket.emit('start', "Ready to place a call");
   }
   function call() {
+    callButton.disabled = true;
+    startButton.disabled = true;
+    hangupButton.disabled = false;
     if(!remote) 
       socket.emit('call', "A user has placed call to you");
 
     console.log("processing call");
-    callButton.disabled = true;
-    hangupButton.disabled = false;
     if (localStream.getVideoTracks().length > 0) {
         console.log('Using video device: ' + localStream.getVideoTracks()[0].label);
     }
@@ -107,9 +111,17 @@ window.onload = function(){
     socket.emit('hangup', "user has ended the call")
   } 
 //users may not run call() until both users have ran start().
-  socket.on('start', function(evt) {
+  socket.on('started', function(evt) {
     console.log(evt)
+    startButton.disabled = false 
   });
+  socket.on('start', function (evt) {
+    console.log(evt)
+    started = true
+    if(started && startButton.disabled) {
+      callButton.disabled = false
+    };
+  })
   socket.on('call', function(evt) {
     console.log(evt);
     remote = true

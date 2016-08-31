@@ -20,11 +20,16 @@ app.get("/", function(req, res) {
     res.render("index")
 });
 
+var connected = []
 io.on('connection', function(socket) {
+    connected.push(socket)
     console.log('a user connected to application url');
-
+    
+    if(connected.length > 1)
+       io.sockets.emit('started', "two users have connected");
+    
     socket.on('start', function(evt) {
-        socket.broadcast.emit('start', evt)
+        socket.broadcast.emit('start', evt);
     });
     socket.on('call', function(evt) {
         socket.broadcast.emit('call', evt)
