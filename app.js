@@ -7,7 +7,7 @@ var jade = require('jade')
 var path = require('path');
 var forceSsl = function (req, res, next) {
     if (req.headers['x-forwarded-proto'] !== 'https') {
-        return res.redirect(['https://', req.get('Host'), req.url].join(''));
+        return res.redirect('https://' + req.headers.host + req.url);
     }
     return next();
  };
