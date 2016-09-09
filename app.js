@@ -1,16 +1,12 @@
 var app = require('express')();
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+// using module to force ssl on heroku
+var enforce = require('express-sslify');
 var logger = require('morgan');
 var serveStatic = require('serve-static');
 var jade = require('jade')
 var path = require('path');
-var forceSsl = function (req, res, next) {
-    if (req.headers['x-forwarded-proto'] !== 'https') {
-        return res.redirect(['https://', req.get('Host'), req.url].join(''));
-    }
-    return next();
-};
 
 app.set('port', process.env.PORT || 8080);
 app.set('views', path.join(__dirname, 'views'));
@@ -20,11 +16,8 @@ app.configure(function() {
     app.use(errorHandler());
     }
 });
-app.configure(function() {
-    if (process.env.NODE_ENV === 'production') {
-        app.use(forceSsl);
-    }
-});
+//using module to force ssl on Heroku
+app.use(enforce.HTTPS({trustProtoHeader: true})); 
 app.use(logger('dev'));
 app.use(serveStatic(path.join(__dirname, 'public')));
 
