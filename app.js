@@ -5,6 +5,12 @@ var logger = require('morgan');
 var serveStatic = require('serve-static');
 var jade = require('jade')
 var path = require('path');
+var forceSsl = function (req, res, next) {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+        return res.redirect(['https://', req.get('Host'), req.url].join(''));
+    }
+    return next();
+ };
 
 app.set('port', process.env.PORT || 8080);
 app.set('views', path.join(__dirname, 'views'));
@@ -15,6 +21,11 @@ app.use(serveStatic(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'development') {
   app.use(errorHandler());
 }
+app.configure(function() {
+    if (env === 'production') {
+        app.use(forceSsl);
+    }
+});
 
 app.get("/", function(req, res) {
     res.render("index")
