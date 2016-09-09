@@ -11,16 +11,15 @@ var path = require('path');
 app.set('port', process.env.PORT || 8080);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-app.configure(function() {
-    if (process.env.NODE_ENV === 'development') {
-    app.use(errorHandler());
-    }
-});
 //using module to force ssl on Heroku
-app.use(enforce.HTTPS({trustProtoHeader: true})); 
+app.use(enforce.HTTPS({ trustProtoHeader: true} )); 
 app.use(logger('dev'));
 app.use(serveStatic(path.join(__dirname, 'public')));
 
+if (process.env.NODE_ENV === 'development') {
+    app.use(errorHandler());
+    }
+    
 app.get("/", function(req, res) {
     res.render("index")
 });
