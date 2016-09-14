@@ -4,6 +4,7 @@
 
 <head>
 <title>Ike's Video Chat App</title>
+<link rel="stylesheet" type="text/css" href='/css/style.css'>
 <!-- <script type='text/javascript' src='https://code.jquery.com/jquery-2.2.4.min.js'></script> -->
 <script type="text/javascript" src='/socket.io/socket.io.js'></script>
 <script type="text/javascript" src='https://webrtc.github.io/adapter/adapter-latest.js'></script>
@@ -11,21 +12,17 @@
 </head>
 
 <body>
-    <div>
+    <div class='options'>
         <button id="startButton">Start</button>
         <button id="callButton">Call</button>
         <button id="hangupButton">Hang Up</button>
     </div>
-    <table border="1" width="100%">
-        <tr>
-            <th>Local Video</th>
-            <th>Remote Video</th> 
-            </tr>
-        <tr>
-            <td><video id="localVideo" autoplay="true" muted="muted"></video></td>
-            <td><video id="remoteVideo" autoplay></video></td> 
-        </tr>
-    </table>
+    <div class='table1'>
+          <video id="remoteVideo" autoplay></video>
+    </div>
+    <div class='table2'>
+           <video id="localVideo" autoplay="true" muted="muted" ></video>
+    </div>
 </body>
 
 </html>

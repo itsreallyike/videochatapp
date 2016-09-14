@@ -1,0 +1,38 @@
+body {
+    background-image: url("plainbackground.jpg");
+    background-repeat: no-repeat;
+    background-position: -50px -130px; 
+}
+
+#remoteVideo {
+    width:1280px;
+    height:720px; 
+    position: center 
+}
+.table1 {
+    width:80%;
+    height:85%;
+    position:fixed;
+    border: none;
+    top:6%;
+    left:10%;
+    overflow:hidden;
+}
+#localVideo {
+    width:360px;
+    height:250px;
+}
+.table2 {
+    width:23%;
+    height:30%;
+    position:fixed;
+    right:4%;
+    bottom:4%;
+    overflow:hidden;
+}
+.options {
+    position:fixed;
+    opacity: 0.8;
+    left:45%;
+    bottom: 4%;
+}

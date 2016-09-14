@@ -2,15 +2,15 @@ window.onload = function(){
   window.onbeforeunload = function(e) {
     hangup();
   }
-  var socket = io();
-  var constraints = {video: true, audio: true};
+  var socket = io('/videochat');
+  var room = 'chatroom';
+  var constraints = {audio: true, video: {width: { min: 1280, ideal: 1280 }, height: { min: 720, ideal: 720 }, frameRate: { ideal: 15, max: 30 } }};
   var localVideo = document.getElementById("localVideo"); 
   var remoteVideo = document.getElementById("remoteVideo");
   var startButton = document.getElementById("startButton");
   var callButton = document.getElementById("callButton");
   var hangupButton = document.getElementById("hangupButton");
   var remote = false //false for local connection
-  var started = false
   var localStream, pc;
 
   startButton.disabled = true;
@@ -22,9 +22,6 @@ window.onload = function(){
 
   function start() {
     startButton.disabled = true;
-    if(started) {
-    callButton.disabled = false;
-    };
     navigator.mediaDevices.getUserMedia(constraints)
     .then(function(mediaStream) {
         localVideo.src = window.URL.createObjectURL(mediaStream);
@@ -36,8 +33,11 @@ window.onload = function(){
     socket.emit('start', "Ready to place a call");
   }
   function call() {
+    if(startButton.disabled = false) {
+      start();
+      startButton.click();
+    }
     callButton.disabled = true;
-    startButton.disabled = true;
     hangupButton.disabled = false;
     if(!remote) 
       socket.emit('call', "A user has placed call to you");
@@ -105,20 +105,29 @@ window.onload = function(){
   function hangup() {
     console.log("Ending call");
     hangupButton.disabled = true;
-    callButton.disabled = false;
     pc.close();
     pc = null;
     socket.emit('hangup', "user has ended the call")
   } 
 //users may not run call() until both users have ran start().
+  socket.on('connect', function(){
+    socket.emit('room', room)
+  });
   socket.on('started', function(evt) {
-    console.log(evt)
-    startButton.disabled = false 
+    if(evt.disconnected) {
+      startButton.disabled = true
+      console.log("Less than two users connected: " + evt.disconnected)
+    } else {
+      if(localStream === undefined) {
+      startButton.disabled = false
+      }
+    }
   });
   socket.on('start', function (evt) {
     console.log(evt)
-    started = true
-    if(started && startButton.disabled) {
+    if(evt.disconnected) {
+      callButton.disabled = true
+    } else if(startButton.disabled) {
       callButton.disabled = false
     };
   })
