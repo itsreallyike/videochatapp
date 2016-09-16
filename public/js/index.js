@@ -86,26 +86,30 @@ window.onload = function(){
   function offer() {
     pc.createOffer()
     .then(function(description){
-      pc.setLocalDescription(description);
-      console.log("set local description")
-      sendMessage(description);
-      console.log("Sent offer to peer" + description.sdp);
+      pc.setLocalDescription(description, function() {
+        console.log("set local description")
+        sendMessage(JSON.stringify({
+        'sdp': pc.localDescription}));
+      });
+      console.log("Sent offer to peer, description: " + JSON.stringify(pc.localDescription));
     });
   };
   function gotIceCandidate(event){
       if(event.candidate) {
-        sendMessage({type: 'candidate', candidate: event.candidate.candidate});
-        console.log("Sent ICE candidates to peer: \n" + event.candidate.candidate);
+        sendMessage(JSON.stringify({'candidate': event.candidate}));
+        console.log("Sent ICE candidates to peer: \n" + JSON.stringify(event.candidate));
       }
   };
   function answerCall() {
     pc.createAnswer()
     .then(function(description){
-      pc.setLocalDescription(description);
-      console.log("set local description")
-      sendMessage(description);
-      console.log("Sent answer to peer: \n" + description.sdp);
-    })
+      pc.setLocalDescription(description, function() {
+        console.log("set local description")
+        sendMessage(JSON.stringify({
+        'sdp': pc.localDescription}));
+      });
+      console.log("Sent answer to peer, description: " + JSON.stringify(pc.localDescription));
+    });;
   }
   /*function gotRemoteIceCandidate(event){
         if(event.candidate) {
@@ -153,16 +157,17 @@ window.onload = function(){
     call();
   });
   socket.on('data', function(data) {
-      if(data.type !== 'candidate') {
+      var message = JSON.parse(data)
+      if(message.sdp) {
         if(remote) {
-          pc.setRemoteDescription(data)
+          pc.setRemoteDescription(message.sdp)
           answerCall();
           pc.onaddstream = function(event) {
             remoteVideo.srcObject = event.stream;
           }
         }
         if(!remote) {
-          pc.setRemoteDescription(data)
+          pc.setRemoteDescription(message.sdp)
           pc.onaddstream = function(event) {
             remoteVideo.srcObject = event.stream;
           }
@@ -170,9 +175,9 @@ window.onload = function(){
       }
 //This actually occurs prior to setting remote description on "!remote" immediately after !remote sets local description. 
       if(remote) {
-        if(data.type === 'candidate') {
-            console.log("Received and added " + data.candidate)
-            pc.addIceCandidate(new RTCIceCandidate(data))
+        if(message.candidate) {
+            console.log("Received and added " + JSON.stringify(message.candidate))
+            pc.addIceCandidate(new RTCIceCandidate(message.candidate))
           }
       }
   });
