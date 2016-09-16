@@ -7,7 +7,7 @@ window.onload = function(){
   var configuration = {
     'iceServers': [
     {
-      'url': 'stun:stun01.sipphone.com'
+      'url': 'stun:stun.l.google.com:19302'
     },
     {
       'url': 'turn:192.158.29.39:3478?transport=udp',
