@@ -4,6 +4,23 @@ window.onload = function(){
   }
   var socket = io('/videochat');
   var room = 'chatroom';
+  var configuration = {
+    'iceServers': [
+    {
+      'url': 'stun:stun01.sipphone.com'
+    },
+    {
+      'url': 'turn:192.158.29.39:3478?transport=udp',
+      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+      'username': '28224511:1379330808'
+    },
+    {
+      'url': 'turn:192.158.29.39:3478?transport=tcp',
+      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
+      'username': '28224511:1379330808'
+    }
+  ]
+}
   var constraints = {audio: true, video: {width: { min: 1280, ideal: 1280 }, height: { min: 720, ideal: 720 }, frameRate: { ideal: 15, max: 30 } }};
   var localVideo = document.getElementById("localVideo"); 
   var remoteVideo = document.getElementById("remoteVideo");
@@ -52,7 +69,7 @@ window.onload = function(){
     createPeerConnection()
   }
   function createPeerConnection() {
-    pc = new RTCPeerConnection();
+    pc = new RTCPeerConnection(configuration);
     console.log("Created a peer connection");
     try {
       localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
