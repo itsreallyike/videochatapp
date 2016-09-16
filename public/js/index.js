@@ -62,6 +62,7 @@ window.onload = function(){
     }
     console.log("Added a stream to peer connection");
     if(!remote) {
+    pc.onicecandidate = gotIceCandidate;
     offer();
     }
   };
@@ -74,14 +75,12 @@ window.onload = function(){
       console.log("Sent offer to peer" + description.sdp);
     });
   };
-  // This is useful if I decide to switch to trickle approach. For now, sending ICE from local via descriptions sdp only.
-  /*function gotIceCandidate(event){
+  function gotIceCandidate(event){
       if(event.candidate) {
-        pc.addIceCandidate(new RTCIceCandidate(event.candidate));
         sendMessage({type: 'candidate', candidate: event.candidate.candidate});
         console.log("Sent ICE candidates to peer: \n" + event.candidate.candidate);
       }
-  }; */
+  };
   function answerCall() {
     pc.createAnswer()
     .then(function(description){
@@ -91,14 +90,14 @@ window.onload = function(){
       console.log("Sent answer to peer: \n" + description.sdp);
     })
   }
-  function gotRemoteIceCandidate(event){
+  /*function gotRemoteIceCandidate(event){
         if(event.candidate) {
           console.log("Obtained new Ice Candidate: " + event.candidate)
           pc.addIceCandidate(new RTCIceCandidate(event.candidate));
           console.log("Sent ICE candidate from RemotePeerC:" + event.candidate.candidate);
           sendMessage({type: 'candidate', candidate: event.candidate.candidate});
         }
-    };
+    };*/
   function sendMessage(data) {
     socket.emit('data', data)
   }
@@ -140,11 +139,10 @@ window.onload = function(){
       if(data.type !== 'candidate') {
         if(remote) {
           pc.setRemoteDescription(data)
-          pc.onicecandidate = gotRemoteIceCandidate;
+          answerCall();
           pc.onaddstream = function(event) {
             remoteVideo.srcObject = event.stream;
           }
-          answerCall();
         }
         if(!remote) {
           pc.setRemoteDescription(data)
@@ -153,13 +151,13 @@ window.onload = function(){
           }
         }
       }
-//This actually occurs prior to setting remote description on "!remote" after "remote" runs gotRemoteIceCandidate. 
-        if(!remote) {
-          if(data.type === 'candidate') {
-            console.log(data.candidate)
+//This actually occurs prior to setting remote description on "!remote" immediately after !remote sets local description. 
+      if(remote) {
+        if(data.type === 'candidate') {
+            console.log("Received and added " + data.candidate)
             pc.addIceCandidate(new RTCIceCandidate(data))
           }
-        }
+      }
   });
   socket.on('hangup', function(evt) {
     console.log(evt)
