@@ -7,17 +7,17 @@ window.onload = function(){
   var configuration = {
     'iceServers': [
     {
-      'url': 'stun:stun.l.google.com:19302'
+      'url': 'stun:stun.stunprotocol.org'
     },
     {
-      'url': 'turn:192.158.29.39:3478?transport=udp',
-      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-      'username': '28224511:1379330808'
+      'url': 'turn:turn.meetme.id:443',
+      'credential': 'public',
+      'username': 'public'
     },
     {
-      'url': 'turn:192.158.29.39:3478?transport=tcp',
-      'credential': 'JZEOEt2V3Qb0y27GRntt2u2PAYA=',
-      'username': '28224511:1379330808'
+      'url': 'turn:turn.meetme.id:443',
+      'credential': 'public',
+      'username': 'public'
     }
   ]
 }
@@ -50,10 +50,6 @@ window.onload = function(){
     socket.emit('start', "Ready to place a call");
   }
   function call() {
-    if(startButton.disabled = false) {
-      start();
-      startButton.click();
-    }
     callButton.disabled = true;
     hangupButton.disabled = false;
     if(!remote) 
@@ -111,14 +107,6 @@ window.onload = function(){
       console.log("Sent answer to peer, description: " + JSON.stringify(pc.localDescription));
     });;
   }
-  /*function gotRemoteIceCandidate(event){
-        if(event.candidate) {
-          console.log("Obtained new Ice Candidate: " + event.candidate)
-          pc.addIceCandidate(new RTCIceCandidate(event.candidate));
-          console.log("Sent ICE candidate from RemotePeerC:" + event.candidate.candidate);
-          sendMessage({type: 'candidate', candidate: event.candidate.candidate});
-        }
-    };*/
   function sendMessage(data) {
     socket.emit('data', data)
   }
@@ -127,6 +115,7 @@ window.onload = function(){
     hangupButton.disabled = true;
     pc.close();
     pc = null;
+    remoteVideo.srcObject = null;
     socket.emit('hangup', "user has ended the call")
   } 
 //users may not run call() until both users have ran start().
@@ -137,10 +126,8 @@ window.onload = function(){
     if(evt.disconnected) {
       startButton.disabled = true
       console.log("Less than two users connected: " + evt.disconnected)
-    } else {
-      if(localStream === undefined) {
+    } else if(localStream === undefined) {
       startButton.disabled = false
-      }
     }
   });
   socket.on('start', function (evt) {
@@ -158,6 +145,10 @@ window.onload = function(){
   });
   socket.on('data', function(data) {
       var message = JSON.parse(data)
+      if(message.candidate && remote) {
+        console.log("Received and added " + JSON.stringify(message.candidate))
+        pc.addIceCandidate(new RTCIceCandidate(message.candidate))
+      }
       if(message.sdp) {
         if(remote) {
           pc.setRemoteDescription(message.sdp)
@@ -172,13 +163,6 @@ window.onload = function(){
             remoteVideo.srcObject = event.stream;
           }
         }
-      }
-//This actually occurs prior to setting remote description on "!remote" immediately after !remote sets local description. 
-      if(remote) {
-        if(message.candidate) {
-            console.log("Received and added " + JSON.stringify(message.candidate))
-            pc.addIceCandidate(new RTCIceCandidate(message.candidate))
-          }
       }
   });
   socket.on('hangup', function(evt) {

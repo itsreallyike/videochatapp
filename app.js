@@ -20,7 +20,6 @@ app.use(serveStatic(path.join(__dirname, 'public')));
 if (process.env.NODE_ENV === 'development') {
     app.use(errorHandler());
 }
-    
 app.get("/", function(req, res) {
     res.render("index")
 });
@@ -29,7 +28,6 @@ var chatApp = io.of('/videochat');
 var users = [];
 var theRoom;
 var count = [];
-
 chatApp.on('connection', function(socket) {
     console.log("current number of users connected: " + Object.keys(chatApp.connected).length)
     console.log('a user joined the room. Socket: ' + socket.id)
@@ -46,8 +44,6 @@ chatApp.on('connection', function(socket) {
         count.push(evt)
         if(Object.keys(chatApp.connected).length > 1 && count.length > 1)
             chatApp.to(theRoom).emit('start', evt)
-        if(Object.keys(chatApp.connected).length > 1 && count.length > 1)
-            count.length = 1 
     });
     socket.on('call', function(evt) {
         socket.broadcast.to(theRoom).emit('call', evt)
@@ -65,12 +61,13 @@ chatApp.on('connection', function(socket) {
             users.splice(users[i], 1) 
             }
         }
-        console.log('A user disconnected, current users: ' + users)
-        console.log("current number of users: " + Object.keys(chatApp.connected).length)
+        count.pop()
         if(Object.keys(chatApp.connected).length < 2)
             chatApp.to(theRoom).emit('started', {disconnected: true, user: users})
         if(Object.keys(chatApp.connected).length < 2)
             chatApp.to(theRoom).emit('start', {disconnected: true, user: users})
+        console.log('A user disconnected, current users: ' + users)
+        console.log("current number of users: " + Object.keys(chatApp.connected).length)
     });
 });
 server.listen(app.get("port"), function () {
