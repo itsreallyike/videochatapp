@@ -2,6 +2,9 @@ body {
     background-image: url("plainbackground.jpg");
     background-repeat: no-repeat;
     background-position: -50px -130px; 
+    width: auto ;
+    max-width: 100% ;
+    height: auto ;
 }
 
 #remoteVideo {
