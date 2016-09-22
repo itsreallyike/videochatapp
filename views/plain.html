@@ -5,23 +5,36 @@
 <head>
 <title>Ike's Video Chat App</title>
 <link rel="stylesheet" type="text/css" href='/css/style.css'>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css"/>
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
 <script type="text/javascript" src='/socket.io/socket.io.js'></script>
 <script type="text/javascript" src='https://webrtc.github.io/adapter/adapter-latest.js'></script>
 <script type="text/javascript" src='/js/index.js'></script>
 </head>
 
 <body>
-    <div class='options'>
-        <button id="startButton">Start</button>
-        <button id="callButton">Call</button>
-        <button id="hangupButton">Hang Up</button>
-    </div>
-    <div class='table1'>
-          <video id="remoteVideo" autoplay></video>
-    </div>
-    <div class='table2'>
-           <video id="localVideo" autoplay="true" muted="muted" ></video>
-    </div>
+    <div class="container-fluid">
+            <div class="row">
+                <div class="col-xs-4">
+                    <button id="startButton" class="btn btn-primary"><i class="fa fa-video-camera"> Start </i></button>
+                </div>
+                <div class="col-xs-4">
+                    <button id="callButton" class="btn btn-primary"><i class="fa fa-phone"> Call </i></button>
+                </div>
+                <div class="col-xs-4">
+                    <button id="hangupButton" class="btn btn-danger"><i class="fa fa-phone-square"> End </i></button>
+                </div>
+            </div>
+            <div class="alert alert-info" id="waiting">
+                <strong>Welcome!</strong> Waiting on another user to connect to the application...
+            </div>
+        <div class='table1'>
+            <video id="remoteVideo" autoplay></video>
+        </div>
+        <div class='table2'>
+            <video id="localVideo" autoplay="true" muted="muted" ></video>
+        </div>
+    </div> 
 </body>
 
 </html>

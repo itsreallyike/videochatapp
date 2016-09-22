@@ -6,16 +6,14 @@ body {
 
 #remoteVideo {
     width:1280px;
-    height:720px; 
-    position: center 
+    height:720px;  
 }
 .table1 {
+    top:6%;
+    left:10%;
     width:80%;
     height:85%;
     position:fixed;
-    border: none;
-    top:6%;
-    left:10%;
     overflow:hidden;
 }
 #localVideo {
@@ -23,16 +21,19 @@ body {
     height:250px;
 }
 .table2 {
+    right:4%;
+    bottom:4%;
     width:23%;
     height:30%;
     position:fixed;
-    right:4%;
-    bottom:4%;
     overflow:hidden;
 }
-.options {
-    position:fixed;
-    opacity: 0.8;
-    left:45%;
-    bottom: 4%;
+.row {
+    bottom: 2%;
+    right: 40%;
+    position: fixed;
+}
+#waiting {
+    top: 4%;
+    position: fixed;
 }

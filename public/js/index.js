@@ -21,12 +21,13 @@ window.onload = function(){
     }
   ]
 }
-  var constraints = {audio: true, video: {width: { min: 1280, ideal: 1280 }, height: { min: 720, ideal: 720 }, frameRate: { ideal: 15, max: 30 } }};
+  var constraints = {audio: true, video: {width: { max: 1280, ideal: 1280 }, height: { max: 720, ideal: 720 }, frameRate: { ideal: 15, max: 30 } }};
   var localVideo = document.getElementById("localVideo"); 
   var remoteVideo = document.getElementById("remoteVideo");
   var startButton = document.getElementById("startButton");
   var callButton = document.getElementById("callButton");
   var hangupButton = document.getElementById("hangupButton");
+  var waiting = document.getElementById("waiting")
   var remote = false //false for local connection
   var localStream, pc;
 
@@ -125,9 +126,11 @@ window.onload = function(){
   socket.on('started', function(evt) {
     if(evt.disconnected) {
       startButton.disabled = true
+      waiting.style.display = "inline"
       console.log("Less than two users connected: " + evt.disconnected)
     } else if(localStream === undefined) {
       startButton.disabled = false
+      waiting.style.display = "none"
     }
   });
   socket.on('start', function (evt) {
@@ -136,6 +139,7 @@ window.onload = function(){
       callButton.disabled = true
     } else if(startButton.disabled) {
       callButton.disabled = false
+      waiting.style.display = "none"
     };
   })
   socket.on('call', function(evt) {
@@ -167,5 +171,9 @@ window.onload = function(){
   });
   socket.on('hangup', function(evt) {
     console.log(evt)
+    hangupButton.disabled = true;
+    pc.close();
+    pc = null;
+    remoteVideo.srcObject = null;
   });
 };
